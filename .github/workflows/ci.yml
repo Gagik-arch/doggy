@@ -1,3 +1,4 @@
+
 name: Nuvo CI
 
 on:
@@ -21,27 +22,35 @@ jobs:
           cache: npm
 
       # Build Nuvo
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
+
+      - name: Type check Nuvo
+        run: npm run typecheck
 
       - name: Build Nuvo
         run: npm run build
 
-      # Package Nuvo locally
-      - name: Create Nuvo package
+      # Create local npm package
+      - name: Pack Nuvo
         run: |
           mkdir -p artifacts
           npm pack --pack-destination ./artifacts
 
-      # Build example against the NEW Nuvo build
+      # Install example dependencies
       - name: Install example dependencies
         working-directory: example
         run: npm ci
 
+      # Install current Nuvo build
       - name: Install local Nuvo package
         working-directory: example
-        run: npm install --no-save --package-lock=false ../artifacts/nuvo-js-core-*.tgz
+        shell: bash
+        run: |
+          PACKAGE=$(find ../artifacts -name "*.tgz" -print -quit)
+          npm install --no-save --package-lock=false "$PACKAGE"
 
+      # Validate example
       - name: Build example
         working-directory: example
         run: npm run build
