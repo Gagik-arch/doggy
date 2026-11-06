@@ -161,3 +161,31 @@ export function setupChildren<T extends DOMElement>(
         }
     }
 }
+
+export function isWritableDOMProperty(
+    element: HTMLElement,
+    name: string
+): boolean {
+    let current: object | null = element;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(
+            current,
+            name
+        );
+
+        if (descriptor) {
+            // Accessor property
+            if (descriptor.get || descriptor.set) {
+                return typeof descriptor.set === 'function';
+            }
+
+            // Data property
+            return descriptor.writable === true;
+        }
+
+        current = Object.getPrototypeOf(current);
+    }
+
+    return false;
+}

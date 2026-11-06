@@ -4,7 +4,7 @@ import type {
 import {
     isPlainObject, setupClassName, setupStyle
 } from '../utils';
-import { setupChildren } from './utils';
+import { isWritableDOMProperty, setupChildren } from './utils';
 
 class Element<T extends HTMLElementTags> {
     public dom: T;
@@ -29,7 +29,7 @@ class Element<T extends HTMLElementTags> {
         if (key) {
             virtualDom.__key = key;
         }
-        
+
         if (rootElement) {
             rootElement.appendChild(this.dom);
         }
@@ -60,68 +60,76 @@ class Element<T extends HTMLElementTags> {
         isForceUpdate = false
     ) {
         if (className !== undefined) {
-            setupClassName(
-                className,
-                this.dom
-            );
+            setupClassName(className, this.dom);
         }
 
         if (style !== undefined) {
-            setupStyle(
-                style,
-                this.dom
-            );
+            setupStyle(style, this.dom);
         }
 
         if (children !== undefined) {
-            if (!Array.isArray(children)) { 
-                  throw new Error( 'Nuvo: Children must be an array.' );
+            if (!Array.isArray(children)) {
+                throw new Error('Nuvo: Children must be an array.');
             }
 
-            setupChildren(
-                children,
-                this.dom,
-                isForceUpdate
-            );
+            setupChildren(children, this.dom, isForceUpdate);
         }
 
         Object.entries(props).forEach(([name, value]) => {
-            if (name === 'events' || isPlainObject(value))  return;
+            if (name === 'events' || isPlainObject(value)) return;
 
-            // HTMLInputElement / HTMLTextAreaElement value
+            // Input and textarea current value ->
             if (
                 name === 'value' &&
                 (
                     this.dom instanceof HTMLInputElement ||
-                    this.dom instanceof HTMLTextAreaElement
+                    this.dom instanceof HTMLTextAreaElement ||
+                    this.dom instanceof HTMLSelectElement
                 )
             ) {
                 const nextValue = value == null ? '' : String(value);
 
+                if (!value == null || value === undefined) {
+                    this.dom.removeAttribute('value');
+                } else {
+                    this.dom.setAttribute('value', nextValue);
+                }
+
                 if (this.dom.value !== nextValue) {
                     this.dom.value = nextValue;
-                    this.dom.setAttribute(name, nextValue);
+                    this.dom.setAttribute('value', nextValue);
                 }
 
                 return;
             }
-
-            // DOM properties
-            if (name in this.dom) {
-                const currentValue = (this.dom as any)[name];
-
-                if (currentValue !== value) {
-                    (this.dom as any)[name] = value ?? '';
-                }
-
-                return;
-            }
-
-            // HTML attributes
-            if (value == null || value === '' || value === undefined) {
+            // <- Input and textarea current value
+            
+            // HTML attributes ->
+            if (value == null || value === '') {
                 this.dom.removeAttribute(name);
                 return;
             }
+            // <- HTML attributes
+
+            // Native DOM properties ->
+            if (
+                name in this.dom &&
+                isWritableDOMProperty(this.dom, name)
+            ) {
+                if (value === undefined || value === undefined) {
+                    this.dom.removeAttribute(name);
+                    return
+                };
+
+                const currentValue = (this.dom as any)[name];
+
+                if (currentValue !== value) {
+                    (this.dom as any)[name] = value;
+                }
+
+                return;
+            }
+            // Native DOM properties <-
 
             const nextValue = String(value);
 
@@ -140,7 +148,7 @@ class Element<T extends HTMLElementTags> {
             Object.entries<EventType<T>[keyof EventType<T>]>(events)
                 .forEach(([
                     type,
-                    listener 
+                    listener
                 ]) => {
                     this.dom.addEventListener(
                         type.replace(/^on/, ''),
@@ -154,7 +162,7 @@ class Element<T extends HTMLElementTags> {
 
     public Destroy() {
         this.controller.abort('Element event is destroyed.');
-        
+
         this.Remove();
     }
 

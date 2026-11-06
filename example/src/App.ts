@@ -12,22 +12,23 @@ interface Todo {
 
 function App() {
     const store = new Store<Todo[]>([]);
-    const value = new Store<string>('');
+    const value = new Store<string | undefined>(undefined);
 
     const onSave = () => {
         if (!value.GetState()) {
             window.alert('Input is empty.');
             return;
+        } else {
+
+            store.SetState((prev) => ([
+                {
+                    title: value.GetState() as string,
+                    id: generateUUID(),
+                }, ...prev
+            ]));
+
+            value.SetState(undefined);
         }
-
-        store.SetState((prev) => ([
-            {
-                title: value.GetState(),
-                id: generateUUID(),
-            }, ...prev
-        ]));
-
-        value.SetState('');
     };
 
     const onChangeInput = (_e: Event, text: string) => {
@@ -54,7 +55,7 @@ function App() {
         });
 
         save.SetProps({
-            disabled: !state.length
+            disabled: !state?.length
         })
     });
 
