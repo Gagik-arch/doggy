@@ -1,0 +1,50 @@
+{
+    "name": "@nuvo-js/core",
+    "version": "0.5.0",
+    "description": "A lightweight custom DOM rendering engine",
+    "keywords": [
+        "nuvo",
+        "dom",
+        "renderer",
+        "rendering-engine",
+        "typescript",
+        "javascript"
+    ],
+    "homepage": "https://github.com/Gagik-arch/nuvo-js#readme",
+    "bugs": {
+        "url": "https://github.com/Gagik-arch/nuvo-js/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Gagik-arch/nuvo-js.git"
+    },
+    "license": "ISC",
+    "author": "Gagik Chilingaryan",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "prepublishOnly": "npm run build"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "devDependencies": {
+        "@eslint/js": "^9.39.5",
+        "@stylistic/eslint-plugin": "^5.10.0",
+        "@types/node": "^26.6.6",
+        "eslint": "^9.39.0",
+        "eslint-plugin-import": "^2.32.0",
+        "typescript": "^7.0.2",
+        "typescript-eslint": "^8.36.0"
+    }
+}

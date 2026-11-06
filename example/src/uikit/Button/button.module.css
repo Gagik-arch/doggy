@@ -1,0 +1,19 @@
+.root {
+    border: none;
+    padding: 0;
+    user-select: none;
+    -webkit-user-drag: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.root_default {
+    background: rgb(2, 78, 220);
+    padding: 6px;
+    transition: background 120ms ease;
+    color: white;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
