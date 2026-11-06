@@ -30,7 +30,7 @@ function App() {
         value.SetState('');
     };
 
-    const onChangeInput = (e: Event, text: string) => {
+    const onChangeInput = (_e: Event, text: string) => {
         value.SetState(text);
     };
 

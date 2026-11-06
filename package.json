@@ -1,6 +1,6 @@
 {
     "name": "@nuvo-js/core",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A lightweight custom DOM rendering engine",
     "keywords": [
         "nuvo",
@@ -29,8 +29,7 @@
             "import": "./dist/index.js"
         },
         "./types": {
-            "types": "./dist/types/index.d.ts",
-            "import": "./dist/types/index.js"
+            "types": "./dist/types.d.ts"
         }
     },
     "scripts": {
