@@ -26,7 +26,12 @@ const createRoot = (
 
 
 if (typeof window !== 'undefined') {
-    window['nuvo-js'] = nuvojs;
+    Object.defineProperty(window, 'nuvo-js', {
+        value: Object.freeze(nuvojs),
+        writable: false,
+        configurable: false,
+        enumerable: false
+    });
 }
 
 export {
