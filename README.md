@@ -17,6 +17,10 @@ Nuvo provides a class-based approach to building web interfaces without JSX or u
 - **No JSX required** — Build interfaces using standard JavaScript and TypeScript.
 - **Lightweight** — Built around native browser APIs.
 
+## Demo
+
+🌐 Live demo: https://example-ten-opal.vercel.app
+
 ## Installation
 
 Install using npm:
