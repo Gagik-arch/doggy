@@ -87,19 +87,22 @@ The `.dom` property provides access to the underlying native DOM element.
 You can specify the native HTML element type using generics:
 
 ```typescript
-const div = new Element<HTMLDivElement>({
-    tagName: 'div',
-    props: {
-        className: 'container'
-    }
-});
 
 const button = new Element<HTMLButtonElement>({
     tagName: 'button',
     props: {
-        textContent: 'Click me'
+        children: ['Click me']
     }
 });
+
+const div = new Element<HTMLDivElement>({
+    tagName: 'div',
+    props: {
+        className: 'container',
+        children:[button.dom]
+    }
+});
+
 ```
 
 This provides better TypeScript support when working with native DOM elements.
