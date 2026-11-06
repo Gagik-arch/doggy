@@ -1,8 +1,7 @@
-import Element from '@lib/Element';
+import {Element} from '@nuvo-js/core';
 import Icons from './assets/index';
 import type { IconProps } from './types';
 import styles from './style.module.css';
-import { clsx } from '$/resources/utils';
 
 class Icon extends Element<HTMLSpanElement> {
     public constructor(
@@ -18,7 +17,7 @@ class Icon extends Element<HTMLSpanElement> {
         super({
             tagName: 'span',
             props: {
-                className: clsx(styles.root, _props.className || ''),
+                className: [styles.root, _props.className || ''].join(' '),
                 style: {
                     width: `${size}px`,
                     height: `${size}px`,

@@ -1,4 +1,4 @@
-import { Element, Store, Fragment  } from '../../dist'
+import { Element, Store, Fragment  } from '@nuvo-js/core'
 import { Button,Input } from './uikit';
 
 function App() {

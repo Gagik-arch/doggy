@@ -1,4 +1,6 @@
-function Fragment(children: (HTMLElement | SVGElement | string | DocumentFragment)[]) {
+import type { DOMElement } from './Element/types';
+
+function Fragment(children: (DOMElement | string | DocumentFragment)[]) {
     const fragment = document.createDocumentFragment();
 
     fragment.append(...children);
