@@ -1,0 +1,43 @@
+name: Publish Nuvo
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      - run: npm run build
+
+      - name: Install example dependencies
+        working-directory: example
+        run: npm ci
+
+      - name: Build example against local Nuvo
+        run: |
+          mkdir -p artifacts
+          npm pack --pack-destination ./artifacts
+          cd example
+          npm install --no-save --package-lock=false ../artifacts/nuvo-js-core-*.tgz
+          npm run build
+
+      - name: Publish to npm
+        run: npm publish --access public
