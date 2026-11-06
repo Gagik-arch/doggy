@@ -1,4 +1,7 @@
 type Handlers = Omit<GlobalEventHandlers, 'addEventListener' | 'removeEventListener'>;
+type Nullable<T> = {
+    [K in keyof T]: T[K] | null;
+};
 
 export type NodeChildren = string | ChildNode | undefined | null;
 export type DOMElement = HTMLElement | SVGElement;
@@ -17,9 +20,9 @@ export type EventType<T extends HTMLElement> = {
 };
 
 export type ElementPropsType<T extends HTMLElementTags = HTMLElement>
-    = Omit<Partial<T>, 'children' | 'className' | 'style'> & Dataset & {
+    = Omit<Nullable<Partial<T>>, 'children' | 'className' | 'style'> & Dataset & {
         children?: Children[] | undefined;
-        className?: string | undefined;
+        className?: ((classList: DOMTokenList) => void) | string | undefined;
         events?: EventType<T>;
         style?: Partial<CSSStyleDeclaration> | undefined;
         key?: string;
