@@ -1,13 +1,12 @@
 import './style.css';
-import { createRoot } from '../../dist'
+import { createRoot } from '@nuvo-js/core'
 import App from './App';
 
-const doggy = window['@']
-
+const nuvo = window['@']
 
 const root = document.getElementById('app');
 
 createRoot(root!, App());
 
-console.log(doggy)
+console.log(nuvo)
 

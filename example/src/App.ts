@@ -3,10 +3,9 @@ import { Button,Input } from './uikit';
 
 function App() {
     const store = new Store<{ id: string, title: string }[]>([])
-    
+
     const input =  new Input({
         name: 'asd',
-        
     })
     
     return (

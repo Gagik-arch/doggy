@@ -1,7 +1,7 @@
 
 import type { InputProps } from './types';
 import styles from './style.module.css';
-import  { Element, Store }  from '../../../../dist'
+import  { Element, Store }  from '@nuvo-js/core'
 
 class Input<T extends string | number = string> extends Element<HTMLLabelElement> {
     public readonly store:  Store<T | undefined>;

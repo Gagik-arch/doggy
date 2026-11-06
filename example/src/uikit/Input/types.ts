@@ -1,4 +1,4 @@
-import type { ElementPropsType } from '@lib/Element';
+import type { ElementPropsType } from '@nuvo-js/core/types';
 
 export type InputProps<T> = Omit<ElementPropsType<HTMLInputElement>, 'min' | 'max' | 'step' | 'value'> & {
     containerClassName?: string;

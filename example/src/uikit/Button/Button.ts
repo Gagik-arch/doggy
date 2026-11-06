@@ -17,7 +17,6 @@ class Button extends Element<HTMLButtonElement> {
                 className: [
                     styles.root,
                     styles[`root_${variant}`],
-                    'squircle-16',
                     className
                 ].join(' '),
                 type,
