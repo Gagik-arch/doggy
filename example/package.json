@@ -1,18 +1,18 @@
 {
-  "name": "nuvo-js example",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "typescript": "~7.0.2",
-    "vite": "^8.3.6"
-  },
-  "dependencies": {
-    "@nuvo-js/core": "file:../nuvo-js-core-1.0.2.tgz"
-  }
+    "name": "nuvo-js example",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "typescript": "~7.0.2",
+        "vite": "^8.3.6"
+    },
+    "dependencies": {
+        "@nuvo-js/core": "^1.0.1"
+    }
 }
