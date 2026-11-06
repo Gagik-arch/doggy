@@ -1,7 +1,43 @@
 import { mergeAttributes } from '../utils';
 import type {
-    Children, DOMElement, VirtualHTMLElement
+    Children,  DOMElement, VirtualHTMLElement
 } from './types';
+
+function hasKeyedChildren(
+    children: DOMElement[]
+): boolean {
+    const keys = children.map(
+        child => (child as VirtualHTMLElement).__key
+    );
+
+    const hasKeys = keys.some(
+        key => key !== undefined && key !== null
+    );
+
+    if (!hasKeys) {
+        return  false;
+    }
+
+    const hasMissingKeys = keys.some(
+        key => key === undefined || key === null
+    );
+
+    if (hasMissingKeys) {
+        throw new Error(
+            'Nuvo: All sibling elements must have a key when using keyed diffing.'
+        );
+    }
+
+    const uniqueKeys = new Set(keys);
+
+    if (uniqueKeys.size !== keys.length) {
+        throw new Error(
+            'Nuvo: Duplicate keys detected among sibling elements.'
+        );
+    }
+
+    return true;
+}
 
 export function compareProps(
     oldNode: DOMElement | null,
@@ -115,11 +151,11 @@ export function setupChildren<T extends DOMElement>(
         if (isForceUpdate) {
             dom.replaceChildren(...extracted);
         } else {
-            const isAvailableKey = ([ ...dom.children ][0] as VirtualHTMLElement | undefined)?.__key;
-         
-            if (isAvailableKey) {
-                keyedDiff(dom, extracted); //  NOTE: key in element
-            } else { //  NOTE: not key in element
+            const diffMode = hasKeyedChildren(extracted as VirtualHTMLElement[]);
+
+            if (diffMode) {
+                keyedDiff(dom, extracted);
+            } else { 
                 unKeyedDiff(dom, extracted);
             }
         }

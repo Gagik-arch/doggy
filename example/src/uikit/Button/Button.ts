@@ -1,4 +1,4 @@
-import {Element} from '@nuvo-js/core';
+import { Element } from '@nuvo-js/core';
 import type { ButtonProps } from './types';
 import styles from './button.module.css';
 

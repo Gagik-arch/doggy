@@ -1,8 +1,8 @@
-import type doggy from './index';
+import type nuvojs from './index';
 
 declare global {
     interface Window {
-        '@': typeof doggy;
+        'nuvo-js': typeof nuvojs;
     }
 }
  

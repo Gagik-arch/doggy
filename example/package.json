@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "nuvo-js example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,6 +13,6 @@
     "vite": "^8.3.6"
   },
   "dependencies": {
-    "@nuvo-js/core": "^0.5.5"
+    "@nuvo-js/core": "^1.0.1"
   }
 }

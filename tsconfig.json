@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "rootDir": "./src",
+        "rootDir": ".",
         "outDir": "./dist",
         "module": "ESNext",
         "moduleResolution": "Bundler",
@@ -28,10 +28,10 @@
         "skipLibCheck": true,
     },
     "include": [
-        "src",
+        "src"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
     ]
 }

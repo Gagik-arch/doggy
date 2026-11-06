@@ -1,10 +1,8 @@
-
 import type { InputProps } from './types';
-import styles from './style.module.css';
-import  { Element, Store }  from '@nuvo-js/core'
+import styles from './input.module.css';
+import { Element } from '@nuvo-js/core';
 
 class Input<T extends string | number = string> extends Element<HTMLLabelElement> {
-    public readonly store:  Store<T | undefined>;
     public readonly input: Element<HTMLInputElement>;
 
     public constructor({
@@ -32,17 +30,16 @@ class Input<T extends string | number = string> extends Element<HTMLLabelElement
                 className: [
                     styles.root,
                     containerClassName,
-                    styles[`container_${variant}`]
+                    styles[`container_${variant}`],
+                    'squircle-26'
                 ].join(' '),
             },
         });
 
-        this.store = new Store<T | undefined>(value);
-
         this.input = new Element<HTMLInputElement>({
             tagName: 'input',
             props: {
-                className: [styles.input, className].join(' '),
+                className: [ styles.input, className ].join(' '),
                 type,
                 autocomplete,
                 name,
@@ -60,7 +57,6 @@ class Input<T extends string | number = string> extends Element<HTMLLabelElement
                                 : target.value
                         ) as T;
 
-                        this.store.SetState(v);
                         onChange?.(e, v);
                     },
 
@@ -73,7 +69,6 @@ class Input<T extends string | number = string> extends Element<HTMLLabelElement
                                 : target.value
                         ) as T;
 
-                        this.store.SetState(v);
                         onInput?.(e, v);
                     },
 
@@ -90,22 +85,6 @@ class Input<T extends string | number = string> extends Element<HTMLLabelElement
                 endContent
             ],
         });
-
-        this.store.Effect((value) => {
-            const newValue = value == null ? '' : String(value);
-
-            if (this.input.dom.value !== newValue) {
-                this.input.dom.value = newValue;
-            }
-        });
-    }
-
-    public SetValue(value: T | undefined) {
-        this.store.SetState(value);
-    }
-
-    public GetValue() {
-        return this.store.GetState();
     }
 }
 

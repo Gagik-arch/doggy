@@ -16,7 +16,7 @@ const createRoot = (
     }
 };
 
- const nuvo = {
+ const nuvojs = {
     Element,
     Store,
     Fragment,
@@ -26,7 +26,7 @@ const createRoot = (
 
 
 if (typeof window !== 'undefined') {
-    window['@'] = nuvo;
+    window['nuvo-js'] = nuvojs;
 }
 
 export {
@@ -37,5 +37,5 @@ export {
     createRoot
 };
 
-export default nuvo
+export default nuvojs
 

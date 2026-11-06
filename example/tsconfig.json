@@ -24,7 +24,7 @@
         "noFallthroughCasesInSwitch": true
     },
     "include": [
-        "src",
-        "../src/types.ts"
+        "./src",
+        "./global.d.ts",
     ]
 }

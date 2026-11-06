@@ -1,10 +1,8 @@
 import type {
-    ElementPropsType, ElementConstructorType, HTMLElementTags, EventType,
-    VirtualHTMLElement
+    ElementPropsType, ElementConstructorType, HTMLElementTags, EventType, VirtualHTMLElement
 } from './types';
 import {
-    isPlainObject,
-    setupClassName, setupStyle
+    isPlainObject, setupClassName, setupStyle
 } from '../utils';
 import { setupChildren } from './utils';
 
@@ -76,6 +74,10 @@ class Element<T extends HTMLElementTags> {
         }
 
         if (children !== undefined) {
+            if (!Array.isArray(children)) { 
+                  throw new Error( 'Nuvo: Children must be an array.' );
+            }
+
             setupChildren(
                 children,
                 this.dom,
@@ -83,37 +85,50 @@ class Element<T extends HTMLElementTags> {
             );
         }
 
-        Object.entries(props)
-            .forEach(([
-                name,
-                value 
-            ]) => {
-                if ( name === 'events' || isPlainObject(value)) {
-                    return;
+        Object.entries(props).forEach(([name, value]) => {
+            if (name === 'events' || isPlainObject(value))  return;
+
+            // HTMLInputElement / HTMLTextAreaElement value
+            if (
+                name === 'value' &&
+                (
+                    this.dom instanceof HTMLInputElement ||
+                    this.dom instanceof HTMLTextAreaElement
+                )
+            ) {
+                const nextValue = value == null ? '' : String(value);
+
+                if (this.dom.value !== nextValue) {
+                    this.dom.value = nextValue;
+                    this.dom.setAttribute(name, nextValue);
                 }
 
-                if (name === 'value' && (this.dom instanceof HTMLInputElement || this.dom instanceof HTMLTextAreaElement)) {
-                    if (this.dom.value === value) {
-                        return;
-                    } else {
-                        this.dom.value = value;
-                    }
+                return;
+            }
+
+            // DOM properties
+            if (name in this.dom) {
+                const currentValue = (this.dom as any)[name];
+
+                if (currentValue !== value) {
+                    (this.dom as any)[name] = value ?? '';
                 }
 
-                if (name in this.dom) {
-                    if (value === undefined || value === '') {
-                        this.dom.removeAttribute(name);
-                    } else {
-                        if (((this.dom)[name as keyof T] !== undefined ) && (this.dom)[name as keyof T] !== value ) {
-                            (this.dom)[name as keyof T] = value;
-                        }
-                    }
-                } else {
-                    if (value !== '' && this.dom.getAttribute(name) !== String(value)) {
-                        this.dom.setAttribute(name, value as string);
-                    }
-                }
-            });
+                return;
+            }
+
+            // HTML attributes
+            if (value == null || value === '' || value === undefined) {
+                this.dom.removeAttribute(name);
+                return;
+            }
+
+            const nextValue = String(value);
+
+            if (this.dom.getAttribute(name) !== nextValue) {
+                this.dom.setAttribute(name, nextValue);
+            }
+        });
 
         return this;
     }

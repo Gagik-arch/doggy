@@ -2,7 +2,7 @@
 
 **Nuvo** is a lightweight, TypeScript-first UI library built around native DOM APIs.
 
-Nuvo provides a class-based approach to building web interfaces without Virtual DOM, JSX, or a complex rendering layer. It gives developers direct control over HTML and SVG elements while providing a simple reactive state management system.
+Nuvo provides a class-based approach to building web interfaces without JSX or unnecessary rendering abstractions. It gives developers direct control over HTML and SVG elements while providing reactive state management and efficient DOM updates through keyed and unkeyed diffing.
 
 ## Features
 
@@ -11,7 +11,9 @@ Nuvo provides a class-based approach to building web interfaces without Virtual 
 - **HTML elements** — Create and configure native HTML elements.
 - **SVG elements** — Build SVG graphics using the same architecture.
 - **Reactive Store** — Manage application state with subscriptions and effects.
-- **No Virtual DOM** — No virtual tree or reconciliation process.
+- **DOM Diffing** — Efficiently update existing DOM elements.
+- **Keyed Diffing** — Reuse, insert, remove, and reorder elements using unique keys.
+- **No Virtual DOM** — Work directly with real DOM elements.
 - **No JSX required** — Build interfaces using standard JavaScript and TypeScript.
 - **Lightweight** — Built around native browser APIs.
 
@@ -30,9 +32,9 @@ npm install @nuvo-js/core
 Nuvo is also accessible through the browser global namespace:
 
 ```javascript
-const nuvo = window['@'];
+const nuvojs = window['nuvo-js'];
 
-console.log(nuvo);
+console.log(nuvojs);
 ```
 
 ### ECMAScript Modules
@@ -102,6 +104,19 @@ const button = new Element<HTMLButtonElement>({
 
 This provides better TypeScript support when working with native DOM elements.
 
+### Updating Properties
+
+Use `SetProps()` to update element properties:
+
+```typescript
+div.SetProps({
+    className: 'container active',
+    title: 'Updated container'
+});
+```
+
+`SetProps()` updates the existing DOM element rather than requiring a new element instance.
+
 ## SVG Elements
 
 Nuvo also provides an `SVGElement` class for creating SVG elements.
@@ -151,6 +166,34 @@ export default Trash;
 ```
 
 The component returns a native SVG DOM element and accepts SVG properties through `SVGElementPropsType`.
+
+## Fragment
+
+Nuvo provides `Fragment` for grouping multiple elements without introducing an additional wrapper element into the DOM.
+
+```typescript
+import { Element, Fragment } from '@nuvo-js/core';
+
+function App() {
+    return Fragment([
+        new Element<HTMLDivElement>({
+            tagName: 'div',
+            props: {
+                children: ['First element']
+            }
+        }).dom,
+
+        new Element<HTMLDivElement>({
+            tagName: 'div',
+            props: {
+                children: ['Second element']
+            }
+        }).dom
+    ]);
+}
+```
+
+Fragments are useful for composing UI structures while keeping the resulting DOM hierarchy clean.
 
 ## Store
 
@@ -210,9 +253,7 @@ store.Subscribe(() => {
 `Effect()` executes its callback immediately when registered and again whenever the store state changes.
 
 ```typescript
-store.Effect(() => {
-    const state = store.GetState();
-
+store.Effect((state) => {
     console.log('Current state:', state);
 });
 ```
@@ -226,6 +267,119 @@ store.Effect(() => {
 | `SetState(callback)` | Updates the state using the previous value. |
 | `Subscribe(callback)` | Listens for state changes. |
 | `Effect(callback)` | Executes immediately and listens for subsequent state changes. |
+
+## DOM Diffing
+
+Nuvo provides DOM diffing to update existing elements without unnecessarily replacing the entire DOM structure.
+
+When updating an element's children through `SetProps()`, Nuvo compares the existing children with the new children.
+
+Nuvo supports two reconciliation strategies:
+
+- **Unkeyed Diffing** — Compares children by their position in the DOM.
+- **Keyed Diffing** — Identifies children using unique keys and reconciles them independently of their position.
+
+### Unkeyed Diffing
+
+For collections without keys, Nuvo compares elements by their position.
+
+```typescript
+const list = new Element<HTMLUListElement>({
+    tagName: 'ul',
+    props: {
+        children: [
+            new Element<HTMLLIElement>({
+                tagName: 'li',
+                props: {
+                    children: ['Item 1']
+                }
+            }).dom,
+
+            new Element<HTMLLIElement>({
+                tagName: 'li',
+                props: {
+                    children: ['Item 2']
+                }
+            }).dom
+        ]
+    }
+});
+```
+
+### Keyed Diffing
+
+When rendering dynamic collections, you can assign a unique `key` to each element.
+
+```typescript
+key: item.id
+```
+
+Nuvo uses these keys to identify and reuse existing DOM elements.
+
+The keyed diffing process:
+
+- **Reuse** — Reuses existing DOM elements with matching keys.
+- **Remove** — Removes elements whose keys no longer exist.
+- **Insert** — Inserts newly created elements.
+- **Reorder** — Moves existing DOM elements when their order changes.
+
+### Example: Reactive Todo List
+
+```typescript
+import { Element, Store } from '@nuvo-js/core';
+
+interface Todo {
+    id: string;
+    title: string;
+}
+
+const todos = new Store<Todo[]>([]);
+
+const list = new Element<HTMLOListElement>({
+    tagName: 'ol',
+    props: {
+        children: []
+    }
+});
+
+todos.Effect((state) => {
+    list.SetProps({
+        children: state.map(todo =>
+            new Element<HTMLLIElement>({
+                tagName: 'li',
+                props: {
+                    key: todo.id,
+                    children: [
+                        todo.title
+                    ]
+                }
+            }).dom
+        )
+    });
+});
+
+// Add a todo
+todos.SetState(prev => [
+    ...prev,
+    {
+        id: crypto.randomUUID(),
+        title: 'Learn Nuvo'
+    }
+]);
+
+// Remove a todo
+todos.SetState(prev =>
+    prev.filter(todo => todo.id !== 'some-id')
+);
+```
+
+### Key Best Practices
+
+- Always use unique keys among sibling elements.
+- Prefer stable identifiers such as database IDs or UUIDs.
+- Avoid array indexes as keys when elements can be reordered or removed.
+- Use consistent keys when rendering dynamic collections.
+- When using keyed diffing, provide keys for all sibling elements.
 
 ## TypeScript Support
 
@@ -246,7 +400,11 @@ Nuvo focuses on simplicity, control, and native browser capabilities.
 
 Rather than introducing another abstraction layer between developers and the DOM, Nuvo provides tools to work directly with the platform.
 
-**Build with JavaScript. Control the DOM. Keep things simple.**
+Inspired by the Italian word nuovo and the French word nouveau, both meaning new, fresh, or recently developed, the name reflects Nuvo's vision of bringing a fresh, simple, and modern approach to building web interfaces.
+
+Build with JavaScript. Control the DOM. Keep things simple.
+
+Nuvo — A fresh approach to the DOM.
 
 ## License
 

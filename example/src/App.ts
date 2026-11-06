@@ -1,31 +1,129 @@
-import { Element, Store, Fragment  } from '@nuvo-js/core'
-import { Button,Input } from './uikit';
+import {
+    Element, Store, Fragment
+} from '@nuvo-js/core';
+import { Button, Input } from './uikit';
+import { generateUUID } from './utils';
+import Icon from './uikit/Icon';
+
+interface Todo {
+    id: string;
+    title: string;
+}
 
 function App() {
-    const store = new Store<{ id: string, title: string }[]>([])
+    const store = new Store<Todo[]>([]);
+    const value = new Store<string>('');
 
-    const input =  new Input({
-        name: 'asd',
+    const onSave = () => {
+        if (!value.GetState()) {
+            window.alert('Input is empty.');
+            return;
+        }
+
+        store.SetState((prev) => ([
+            {
+                title: value.GetState(),
+                id: generateUUID(),
+            }, ...prev
+        ]));
+
+        value.SetState('');
+    };
+
+    const onChangeInput = (e: Event, text: string) => {
+        value.SetState(text);
+    };
+
+    const save = new Button({
+        variant: 'primary',
+        className: 'end_content_button',
+        children: ['Save'],
+        onPress: onSave,
     })
-    
+
+    const textfield = new Input({
+        name: 'example-input',
+        endContent: save.dom,
+        placeholder: 'Add todo.',
+        onInput: onChangeInput,
+    });
+
+    value.Effect((state) => {
+        textfield.input.SetProps({
+            value: state,
+        });
+
+        save.SetProps({
+            disabled: !state.length
+        })
+    });
+
+    const ol = new Element<HTMLOListElement>({
+        tagName: 'ol',
+        props: {
+            id: 'list_container',
+            children: [],
+        },
+    });
+
+    store.Effect((state) => {
+        ol.SetProps({
+            children: state.length
+                ? state.map((item) => {
+                    return (
+                        new Element<HTMLLIElement>({
+                            tagName: 'li',
+                            props: {
+                                className: 'squircle-26',
+                                key: item.id,
+                                children: [
+                                    item.title, new Button({
+                                        variant: 'error',
+                                        className: 'squircle-26',
+                                        children: [
+                                            new Icon('Trash', {
+                                                size: 16,
+                                            }).dom
+                                        ],
+                                        onPress: () => {
+                                            store.SetState(prev => prev.filter(e => e.id !== item.id));
+                                        },
+                                    }).dom
+                                ],
+                            },
+                        }).dom
+                    );
+                })
+                : [
+                    new Element<HTMLSpanElement>({
+                        tagName: 'span',
+                        props: {
+                            children: ['Todos does not exists!'],
+                        },
+                    }).dom
+                ],
+        });
+    });
+
     return (
         Fragment([
-             new Element<HTMLDivElement>({
-                    tagName: 'div',
-                    props: {
-                        className:'row',
-                        children: [
-                            input.dom,
+            new Element<HTMLHeadingElement>({
+                tagName: 'h1',
+                props: {
+                    children: ['Nuvo todo example.'],
+                },
+            }).dom,
 
-                            new Button({
-                                children: [
-                                    'save'
-                                ]
-                            }).dom
-                        ]
-                    }
-                }).dom
-            ])
+            new Element<HTMLDivElement>({
+                tagName: 'div',
+                props: {
+                    className: 'row',
+                    children: [textfield.dom],
+                },
+            }).dom,
+
+            ol.dom
+        ])
     );
 }
 
